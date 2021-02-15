@@ -17,7 +17,7 @@ buildscript {
 
   dependencies {
     ...
-    classpath 'com.appswithlove.updraft:updraft:2.1.4'
+    classpath 'com.appswithlove.updraft:updraft:2.1.5'
   }
 }
 ```
@@ -71,7 +71,7 @@ buildscript {
 		...
 	}
 	dependencies{
-	    classpath 'com.appswithlove.updraft:updraft:2.1.4'
+	    classpath 'com.appswithlove.updraft:updraft:2.1.5'
 	    ...
 	}
 }

@@ -50,6 +50,15 @@ test {
     }
 }
 
+gradlePlugin {
+    plugins {
+        "updraft" {
+            id = "updraft"
+            implementationClass = "${group}.UpdraftPlugin"
+        }
+    }
+}
+
 mavenPublish {
     targets {
         // Modify the existing uploadArchives task
