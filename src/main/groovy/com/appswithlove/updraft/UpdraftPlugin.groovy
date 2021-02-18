@@ -52,6 +52,14 @@ class UpdraftPlugin implements Plugin<Project> {
                         throw new GradleException('There was no url provided for this buildVariant. Please check for typos.')
                     }
 
+                    if (urls instanceof String) {
+                        println("--------------------------------------")
+                        println("Url was not wrapped in array. Doing it for you. :)")
+                        println("url --> [url]")
+                        println("--------------------------------------")
+                        urls = [urls]
+                    }
+
                     for (String url in urls) {
                         //Build and execute of the curl command for Updraft upload
 
