@@ -2,11 +2,14 @@
 
 This is a gradle plugin for automated upload to updraft.
 
+
 ## Instructions
 
 In order to use the plugin follow those steps:
  
 1.Add the code below to you `build.gradle` file in the `app` folder.
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.appswithlove.updraft/updraft)
 
 ```groovy
 buildscript {
@@ -17,7 +20,7 @@ buildscript {
 
   dependencies {
     ...
-    classpath 'com.appswithlove.updraft:updraft:2.1.5'
+    classpath 'com.appswithlove.updraft:updraft:VERSION'
   }
 }
 ```
@@ -71,7 +74,7 @@ buildscript {
 		...
 	}
 	dependencies{
-	    classpath 'com.appswithlove.updraft:updraft:2.1.5'
+	    classpath 'com.appswithlove.updraft:updraft:VERSION'
 	    ...
 	}
 }
