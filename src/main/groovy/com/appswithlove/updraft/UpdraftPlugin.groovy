@@ -18,81 +18,115 @@ class UpdraftPlugin implements Plugin<Project> {
                 // Declares that the project runs after the build, not before.
                 // If not stated, it will run at every gradle sync.
                 doLast {
-                    /*if (project.updraftExtension.updraftUrl == null) {
-                      throw new GradleException('Please define Updraft url in build.gradle.')
-                    }*/
+                    // APK
                     String filename = variant.outputs[0].outputFile
 
-                    def file = new File(filename)
-                    String fileWithoutExt = file.name.take(file.name.lastIndexOf('.'))
+                    def apkFile = new File(filename)
+                    String fileWithoutExt = apkFile.name.take(apkFile.name.lastIndexOf('.'))
 
-                    if (file != null && !file.exists()) {
-                        def apkFolder = new File(file.getParent())
+                    if (apkFile != null && !apkFile.exists()) {
+                        def apkFolder = new File(apkFile.getParent())
                         for (File currentFile in apkFolder.listFiles()) {
                             if (currentFile.getName().startsWith(fileWithoutExt)) {
-                                file = currentFile
+                                apkFile = currentFile
                             }
                         }
                     }
 
-                    if (file != null && !file.exists()) {
+                    if (apkFile != null && !apkFile.exists()) {
                         throw new GradleException("Could not find a build artifact. (Make sure to run assemble${variant.name.capitalize()} before)")
                     }
 
-                    //Getting git information
-                    def gitBranch = executeGitCommand("git rev-parse --abbrev-ref HEAD", "custom_branch")
-                    def gitTags = executeGitCommand("git describe --tags", "custom_tags")
-                    def gitCommit = executeGitCommand("git rev-parse HEAD", "custom_commit")
-                    def gitUrl = executeGitCommand("git config --get remote.origin.url", "custom_URL")
-                    def whatsNew = executeGitCommand("git log -1 --pretty=%B", "whats_new")
+                    upload(project, variant, apkFile, filename)
+                }
+            }
 
-                    def urls = project.updraft.urls[variant.name.capitalize()]
+            //Creates a task for every available build variant / flavor
+            project.tasks.create("updraftBundle${variant.name.capitalize()}") {
+                // Declares that the project runs after the build, not before.
+                // If not stated, it will run at every gradle sync.
+                doLast {
+                    String filename = variant.outputs[0].outputFile
 
-                    if (urls == null || urls.isEmpty()) {
-                        throw new GradleException('There was no url provided for this buildVariant. Please check for typos.')
-                    }
+                    def apkFile = new File(filename)
+                    String fileWithoutExt = apkFile.name.take(apkFile.name.lastIndexOf('.'))
 
-                    if (urls instanceof String) {
-                        println("--------------------------------------")
-                        println("Url was not wrapped in array. Doing it for you. :)")
-                        println("url --> [url]")
-                        println("--------------------------------------")
-                        urls = [urls]
-                    }
+                    // AAB
+                    def basePath = getProject().getProjectDir().getAbsolutePath()
+                    def bundlePath = "${basePath}/build/outputs/bundle/${variant.name.capitalize()}/${fileWithoutExt}.aab"
 
-                    for (String url in urls) {
-                        //Build and execute of the curl command for Updraft upload
-
-                        new ByteArrayOutputStream().withStream { os ->
-                            def result = project.exec {
-                                executable 'curl'
-                                args '-X', 'PUT',
-                                        '-F', "app=@${file}",
-                                        '-F', "build_type=Gradle",
-                                        gitBranch.join(" "),
-                                        gitUrl.join(" "),
-                                        gitTags.join(" "),
-                                        gitCommit.join(" "),
-                                        whatsNew.join(" "),
-                                        url
-                                standardOutput os
-                            }
-
-                            def execResponse = new JsonSlurperClassic().parseText(os.toString())
-
-                            if (execResponse instanceof HashMap && execResponse.size() > 0) {
-                                if (execResponse.containsKey("success") && execResponse["success"] == "ok") {
-                                    ok(variant.name.capitalize(), url, filename)
-                                } else if (execResponse.containsKey("detail") && execResponse["detail"] == "Not found.") {
-                                    throw new GradleException('Could not updraft to the given url. Please recheck that.')
-                                } else {
-                                    throw new GradleException(os.toString())
-                                }
-                            } else {
-                                ok(variant.name.capitalize(), url, filename)
+                    def aabFile = new File(bundlePath)
+                    if (aabFile != null && !aabFile.exists()) {
+                        def aabFolder = new File(file.getParent())
+                        for (File currentFile in aabFolder.listFiles()) {
+                            if (currentFile.getName().startsWith(fileWithoutExt)) {
+                                aabFile = currentFile
                             }
                         }
                     }
+
+                    if (aabFile != null && !aabFile.exists()) {
+                        throw new GradleException("Could not find a build artifact. (Make sure to run bundle${variant.name.capitalize()} before)")
+                    }
+
+                    upload(project, variant, aabFile, bundlePath)
+                }
+            }
+        }
+    }
+
+    private void upload(Project project, variant, file, String filename) {
+        // Getting git information
+        def gitBranch = executeGitCommand("git rev-parse --abbrev-ref HEAD", "custom_branch")
+        def gitTags = executeGitCommand("git describe --tags", "custom_tags")
+        def gitCommit = executeGitCommand("git rev-parse HEAD", "custom_commit")
+        def gitUrl = executeGitCommand("git config --get remote.origin.url", "custom_URL")
+        def whatsNew = executeGitCommand("git log -1 --pretty=%B", "whats_new")
+
+        def urls = project.updraft.urls[variant.name.capitalize()]
+
+        if (urls == null || urls.isEmpty()) {
+            throw new GradleException('There was no url provided for this buildVariant. Please check for typos.')
+        }
+
+        if (urls instanceof String) {
+            println("--------------------------------------")
+            println("Url was not wrapped in array. Doing it for you. :)")
+            println("url --> [url]")
+            println("--------------------------------------")
+            urls = [urls]
+        }
+
+        for (String url in urls) {
+            //Build and execute of the curl command for Updraft upload
+
+            new ByteArrayOutputStream().withStream { os ->
+                def result = project.exec {
+                    executable 'curl'
+                    args '-X', 'PUT',
+                            '-F', "app=@${file}",
+                            '-F', "build_type=Gradle",
+                            gitBranch.join(" "),
+                            gitUrl.join(" "),
+                            gitTags.join(" "),
+                            gitCommit.join(" "),
+                            whatsNew.join(" "),
+                            url
+                    standardOutput os
+                }
+
+                def execResponse = new JsonSlurperClassic().parseText(os.toString())
+
+                if (execResponse instanceof HashMap && execResponse.size() > 0) {
+                    if (execResponse.containsKey("success") && execResponse["success"] == "ok") {
+                        ok(variant.name.capitalize(), url, filename)
+                    } else if (execResponse.containsKey("detail") && execResponse["detail"] == "Not found.") {
+                        throw new GradleException('Could not updraft to the given url. Please recheck that.')
+                    } else {
+                        throw new GradleException(os.toString())
+                    }
+                } else {
+                    ok(variant.name.capitalize(), url, filename)
                 }
             }
         }

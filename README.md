@@ -6,6 +6,9 @@ This is a gradle plugin for automated upload to updraft.
 ## Instructions
 
 In order to use the plugin follow those steps:
+
+Preconditions:
+- Uses Java 11
  
 1.Add the code below to you `build.gradle` file in the project root folder.
 
@@ -47,20 +50,22 @@ updraft {
 4.Done! 
 
 ## Usage
-After installing the plugin, you should be able to find the Gradle Updraft tasks in Android Studio. The naming is always `updraft` + buildVariant. The appropriate url will be choosen as destination. There is 1 task for every available buildVariant. 
-`"Gradle Project" Window -> Tasks -> Other -> updraft... (e.g. updraftRelease)`
+After installing the plugin, you should be able to find the Gradle Updraft tasks in Android Studio. The naming is always `updraft` + buildVariant (`updraftBundle` + buildVariant for App Bundles). The appropriate url will be chosen as destination. There is 1 task for every available buildVariant.
+`"Gradle Project" Window -> Tasks -> Other -> updraft... (e.g. updraftRelease or updraftBundleRelease)`
 In order to use them, make sure that you build the project *before*. 
 
 Otherwise, you can call the gradle tasks via command: 
 
 ```
-./gradlew updraftRelease
+./gradlew updraftRelease // for APK
+./gradlew updraftBundleRelease // for AAB
 ```
 
 Or combined with clean + assemble: 
 
 ```
-./gradlew clean assembleRelease updraftRelease
+./gradlew clean assembleRelease updraftRelease // for APK
+./gradlew clean bundleRelease updraftBundleRelease // for AAB
 ```
 
 ## Debug
