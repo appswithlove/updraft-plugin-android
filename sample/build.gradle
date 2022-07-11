@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'updraft'
+    id 'com.appswithlove.updraft'
 }
 
 android {
@@ -71,6 +71,7 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 }
+
 
 updraft {
     urls['StageDebug'] = ["https://getupdraft.com/api/app_upload/eaa30e534f824fde8b9a0d8b7071834a/65ae1e0f4b1f4b1898c9c956c4486289/"]

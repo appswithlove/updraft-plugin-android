@@ -31,7 +31,7 @@ buildscript {
 2.Apply the plugin in `app/build.gradle`
 
 ```groovy
-    id 'updraft'
+    id 'com.appswithlove.updraft'
 ```
 
 3.Add one or multiple `urls['YOURPRODUCTFLAVOUR']` wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. https://updraft.com/api/app_upload/.../.../)
@@ -67,6 +67,9 @@ Or combined with clean + assemble:
 ./gradlew clean assembleRelease updraftRelease // for APK
 ./gradlew clean bundleRelease updraftBundleRelease // for AAB
 ```
+
+## Breaking Change
+When Upgrading from Version `2.1.7` to `2.2.0`, the plugin id must be changed from `updraft` to `com.appswithlove.updraft`
 
 ## Release Notes
 In order to upload release notes, there are two options:

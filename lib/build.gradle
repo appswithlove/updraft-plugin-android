@@ -18,13 +18,8 @@ dependencies {
     testRuntimeOnly 'cglib:cglib-nodep:3.2.0'
 }
 
-gradlePlugin {
-    plugins {
-        "updraft" {
-            id = "updraft"
-            implementationClass = "${group}.UpdraftPlugin"
-        }
-    }
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
 }
 
 test {
