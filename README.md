@@ -31,7 +31,7 @@ buildscript {
 2.Apply the plugin in `app/build.gradle`
 
 ```groovy
-apply plugin: 'updraft'
+    id 'updraft'
 ```
 
 3.Add one or multiple `urls['YOURPRODUCTFLAVOUR']` wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. https://updraft.com/api/app_upload/.../.../)
@@ -67,6 +67,12 @@ Or combined with clean + assemble:
 ./gradlew clean assembleRelease updraftRelease // for APK
 ./gradlew clean bundleRelease updraftBundleRelease // for AAB
 ```
+
+## Release Notes
+In order to upload release notes, there are two options:
+1. Last commit message (default). If you don't specify anything, the release notes will contain the content of the latest commit message.
+2. Add your release notes to `/src/main/updraft/release-notes.txt` or `/src/someFlavor/updraft/release-notes.txt`. If this file exists in either `main` or your current `flavour`, it will be taken instead of the git commit message.
+
 
 ## Debug
 
