@@ -22,7 +22,7 @@ buildscript {
         File[] contents = directory.listFiles();
         if (contents == null || contents.length == 0) {
             println("updraft - mavenCentral version")
-            classpath "com.appswithlove.updraft:updraft:2.1.7"
+            classpath "com.appswithlove.updraft:updraft:2.2.0"
         } else {
             println("updraft - local version")
             classpath fileTree(include: ['*.jar'], dir: 'lib/build/libs')
