@@ -53,11 +53,11 @@ class UpdraftPlugin implements Plugin<Project> {
 
                     // AAB
                     def basePath = getProject().getProjectDir().getAbsolutePath()
-                    def bundlePath = "${basePath}/build/outputs/bundle/${variant.name.capitalize()}/${fileWithoutExt}.aab"
+                    def bundlePath = "${basePath}/build/outputs/bundle/${variant.name}/${fileWithoutExt}.aab"
 
                     def aabFile = new File(bundlePath)
                     if (aabFile != null && !aabFile.exists()) {
-                        def aabFolder = new File(file.getParent())
+                        def aabFolder = new File(aabFile.getParent())
                         for (File currentFile in aabFolder.listFiles()) {
                             if (currentFile.getName().startsWith(fileWithoutExt)) {
                                 aabFile = currentFile
@@ -66,8 +66,9 @@ class UpdraftPlugin implements Plugin<Project> {
                     }
 
                     if (aabFile != null && !aabFile.exists()) {
-                        throw new GradleException("Could not find a build artifact. (Make sure to run bundle${variant.name.capitalize()} before)")
+                        throw new GradleException("Could not find a build artifact. (Make sure to run bundle${variant.name.capitalize()} before). \n We tried following location ${bundlePath}")
                     }
+
 
                     upload(project, variant, aabFile, bundlePath)
                 }
@@ -77,11 +78,11 @@ class UpdraftPlugin implements Plugin<Project> {
 
     private void upload(Project project, variant, file, String filename) {
         // Getting git information
-        def gitBranch = executeGitCommand("git rev-parse --abbrev-ref HEAD", "custom_branch")
-        def gitTags = executeGitCommand("git describe --tags", "custom_tags")
-        def gitCommit = executeGitCommand("git rev-parse HEAD", "custom_commit")
-        def gitUrl = executeGitCommand("git config --get remote.origin.url", "custom_URL")
-        def whatsNew = executeGitCommand("git log -1 --pretty=%B", "whats_new")
+        def gitBranch = createCurlParam(executeGitCommand("git rev-parse --abbrev-ref HEAD"), "custom_branch")
+        def gitTags = createCurlParam(executeGitCommand("git describe --tags"), "custom_tags")
+        def gitCommit = createCurlParam(executeGitCommand("git rev-parse HEAD"), "custom_commit")
+        def gitUrl = createCurlParam(executeGitCommand("git config --get remote.origin.url"), "custom_URL")
+        def whatsNew = createCurlParam(getReleaseNotes(project, variant), "whats_new")
 
         def urls = project.updraft.urls[variant.name.capitalize()]
 
@@ -106,14 +107,15 @@ class UpdraftPlugin implements Plugin<Project> {
                     args '-X', 'PUT',
                             '-F', "app=@${file}",
                             '-F', "build_type=Gradle",
-                            gitBranch.join(" "),
-                            gitUrl.join(" "),
-                            gitTags.join(" "),
-                            gitCommit.join(" "),
-                            whatsNew.join(" "),
+                            gitBranch,
+                            gitUrl,
+                            gitTags,
+                            gitCommit,
+                            whatsNew,
                             url
                     standardOutput os
                 }
+
 
                 def execResponse = new JsonSlurperClassic().parseText(os.toString())
 
@@ -132,6 +134,19 @@ class UpdraftPlugin implements Plugin<Project> {
         }
     }
 
+    private static String getReleaseNotes(Project project, variant) {
+        def variantFile = new File(project.projectDir.toString() + "/src/" + variant.productFlavors[0].name + "/updraft/release-notes.txt")
+        def mainFile = new File(project.projectDir.toString() + "/src/main/updraft/release-notes.txt")
+
+        if (variantFile.exists()) {
+            variantFile.readLines().join("\n")
+        } else if (mainFile.exists()) {
+            mainFile.readLines().join("\n")
+        } else {
+            executeGitCommand("git log -1 --pretty=%B")
+        }
+    }
+
     private void ok(String variant, String updraftUrl, String apkPath) {
         println()
         println("--------------------------------------")
@@ -142,15 +157,23 @@ class UpdraftPlugin implements Plugin<Project> {
         println("--------------------------------------")
     }
 
-    private static List<String> executeGitCommand(bashUrl, name) {
-        def item = [""]
+    private static String executeGitCommand(bashUrl) {
         def error = null
         def command = bashUrl.execute()
         def outputUrlStream = new StringBuffer()
         command.waitForProcessOutput(outputUrlStream, error)
         if (error == null && outputUrlStream.size() > 0) {
-            item = ['-F', "${name}=${outputUrlStream}"]
+            outputUrlStream.toString()
+        } else {
+            ""
         }
-        item
+    }
+
+    private static String createCurlParam(String text, String name) {
+        if (text.isEmpty()) {
+            ""
+        } else {
+            "-F ${name}=${text} "
+        }
     }
 }
