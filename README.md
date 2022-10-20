@@ -23,7 +23,7 @@ buildscript {
 
   dependencies {
     ...
-    classpath 'com.appswithlove.updraft:updraft:2.2.0'
+    classpath 'com.appswithlove.updraft:updraft:2.2.1'
   }
 }
 ```
@@ -72,9 +72,10 @@ Or combined with clean + assemble:
 When Upgrading from Version `2.1.7` to `2.2.0`, the plugin id must be changed from `updraft` to `com.appswithlove.updraft`
 
 ## Release Notes
-In order to upload release notes, there are two options:
+In order to upload release notes, there are 3 options:
 1. Last commit message (default). If you don't specify anything, the release notes will contain the content of the latest commit message.
-2. Add your release notes to `/src/main/updraft/release-notes.txt` or `/src/someFlavor/updraft/release-notes.txt`. If this file exists in either `main` or your current `flavour`, it will be taken instead of the git commit message.
+2. Add parameter `releaseNotes` to `updraft` tag and pass in a string or function that generates a string.
+3. Add your release notes to `/src/main/updraft/release-notes.txt` or `/src/someFlavor/updraft/release-notes.txt`. If this file exists in either `main` or your current `flavour`, it will be taken instead of the git commit message.
 
 
 ## Debug
@@ -88,7 +89,7 @@ buildscript {
 		...
 	}
 	dependencies{
-	    classpath 'com.appswithlove.updraft:updraft:2.2.0'
+	    classpath 'com.appswithlove.updraft:updraft:2.2.1'
 	    ...
 	}
 }

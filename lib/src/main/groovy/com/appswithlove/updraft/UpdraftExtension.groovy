@@ -5,4 +5,5 @@ package com.appswithlove.updraft
  */
 class UpdraftExtension {
     def urls = [:]
+    def releaseNotes = null
 }

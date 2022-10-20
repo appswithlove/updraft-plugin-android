@@ -18,11 +18,12 @@ buildscript {
         // if :lib was built before, take the local version,
         // otherwise it takes the version on server.
         // check the Build window for output.
+
         File directory = new File(getRootDir(), "/lib/build/libs")
         File[] contents = directory.listFiles();
         if (contents == null || contents.length == 0) {
             println("updraft - mavenCentral version")
-            classpath "com.appswithlove.updraft:updraft:2.2.0"
+            classpath "com.appswithlove.updraft:updraft:2.2.1"
         } else {
             println("updraft - local version")
             classpath fileTree(include: ['*.jar'], dir: 'lib/build/libs')

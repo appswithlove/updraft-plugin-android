@@ -59,6 +59,7 @@ class UpdraftPlugin implements Plugin<Project> {
                     if (aabFile != null && !aabFile.exists()) {
                         def aabFolder = new File(aabFile.getParent())
                         for (File currentFile in aabFolder.listFiles()) {
+                            println("file $currentFile.path")
                             if (currentFile.getName().startsWith(fileWithoutExt)) {
                                 aabFile = currentFile
                             }
@@ -135,15 +136,19 @@ class UpdraftPlugin implements Plugin<Project> {
     }
 
     private static String getReleaseNotes(Project project, variant) {
-        def variantFile = new File(project.projectDir.toString() + "/src/" + variant.productFlavors[0].name + "/updraft/release-notes.txt")
-        def mainFile = new File(project.projectDir.toString() + "/src/main/updraft/release-notes.txt")
-
-        if (variantFile.exists()) {
-            variantFile.readLines().join("\n")
-        } else if (mainFile.exists()) {
-            mainFile.readLines().join("\n")
+        if (project.updraft.releaseNotes != null) {
+            project.updraft.releaseNotes
         } else {
-            executeGitCommand("git log -1 --pretty=%B")
+            def variantFile = new File(project.projectDir.toString() + "/src/" + variant.productFlavors[0].name + "/updraft/release-notes.txt")
+            def mainFile = new File(project.projectDir.toString() + "/src/main/updraft/release-notes.txt")
+
+            if (variantFile.exists()) {
+                variantFile.readLines().join("\n")
+            } else if (mainFile.exists()) {
+                mainFile.readLines().join("\n")
+            } else {
+                executeGitCommand("git log -1 --pretty=%B")
+            }
         }
     }
 
