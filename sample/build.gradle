@@ -1,3 +1,6 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -80,7 +83,6 @@ updraft {
 }
 
 
-
 String gitLatestTag() {
     def hashStdOut = new ByteArrayOutputStream()
     exec {
@@ -91,6 +93,15 @@ String gitLatestTag() {
 }
 
 String gitNotes(String latestTag) {
+    Pattern pattern = Pattern.compile("updraft(.*)(Release|Debug)");
+    Matcher matcher = pattern.matcher(gradle.startParameter.taskNames[0] ?: "")
+    matcher.find()
+    try {
+        println("Matches " + matcher.group(1))
+    } catch (Exception exception) {
+
+    }
+
     def source = (latestTag) ? "$latestTag..HEAD" : "--max-count=20"
 
     def hashStdOut = new ByteArrayOutputStream()

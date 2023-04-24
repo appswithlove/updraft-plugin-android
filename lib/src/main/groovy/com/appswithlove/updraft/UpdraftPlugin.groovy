@@ -139,10 +139,13 @@ class UpdraftPlugin implements Plugin<Project> {
         if (project.updraft.releaseNotes != null) {
             project.updraft.releaseNotes
         } else {
-            def variantFile = new File(project.projectDir.toString() + "/src/" + variant.productFlavors[0].name + "/updraft/release-notes.txt")
+            def variantFile = null
+            if (variant.productFlavors.size() > 0) {
+                variantFile = new File(project.projectDir.toString() + "/src/" + variant.productFlavors[0].name + "/updraft/release-notes.txt")
+            }
             def mainFile = new File(project.projectDir.toString() + "/src/main/updraft/release-notes.txt")
 
-            if (variantFile.exists()) {
+            if (variantFile != null && variantFile.exists()) {
                 variantFile.readLines().join("\n")
             } else if (mainFile.exists()) {
                 mainFile.readLines().join("\n")
