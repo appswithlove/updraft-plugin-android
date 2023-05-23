@@ -23,6 +23,8 @@ jobs:
       -   name: Close Repository
           run: ./gradlew closeAndReleaseRepository
           env:
+            mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
+            mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
             ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
             ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
             ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
