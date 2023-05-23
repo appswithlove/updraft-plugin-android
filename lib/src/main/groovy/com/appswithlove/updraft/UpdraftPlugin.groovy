@@ -122,14 +122,16 @@ class UpdraftPlugin implements Plugin<Project> {
 
                 if (execResponse instanceof HashMap && execResponse.size() > 0) {
                     if (execResponse.containsKey("success") && execResponse["success"] == "ok") {
-                        ok(variant.name.capitalize(), url, filename)
+                        def publicUrl = execResponse["public_link"]
+                        ok(publicUrl)
                     } else if (execResponse.containsKey("detail") && execResponse["detail"] == "Not found.") {
                         throw new GradleException('Could not updraft to the given url. Please recheck that.')
                     } else {
                         throw new GradleException(os.toString())
                     }
                 } else {
-                    ok(variant.name.capitalize(), url, filename)
+                    println(execResponse)
+                    ok(null)
                 }
             }
         }
@@ -155,13 +157,13 @@ class UpdraftPlugin implements Plugin<Project> {
         }
     }
 
-    private void ok(String variant, String updraftUrl, String apkPath) {
+    private void ok(String publicUrl) {
         println()
         println("--------------------------------------")
         println("Your App was sucessfully updrafted!")
-        println("Local APK: $apkPath")
-        println("Flavour: $variant")
-        println("Url: $updraftUrl")
+        if (publicUrl != null) {
+            println("Get it here -> $publicUrl")
+        }
         println("--------------------------------------")
     }
 
