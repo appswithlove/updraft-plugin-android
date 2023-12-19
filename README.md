@@ -23,8 +23,16 @@ buildscript {
 
   dependencies {
     ...
-    classpath 'com.appswithlove.updraft:updraft:2.2.1'
+    classpath 'com.appswithlove.updraft:updraft:2.2.3'
   }
+}
+```
+
+or 
+
+```kotlin
+plugins {
+  id("com.appswithlove.updraft") version "2.2.3"
 }
 ```
 
@@ -32,6 +40,12 @@ buildscript {
 
 ```groovy
     id 'com.appswithlove.updraft'
+```
+
+or 
+
+```kotlin
+  id("com.appswithlove.updraft")
 ```
 
 3.Add one or multiple `urls['YOURPRODUCTFLAVOUR']` wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. https://updraft.com/api/app_upload/.../.../)
@@ -44,6 +58,16 @@ The part `YourBuildVariant` should be replaced by the exact name your build vari
 updraft {
   urls['StagingRelease'] = ["your/staging/url/"]
   urls['ProdRelease'] = ["your/prod/url/", "your/prod2/url/"]
+}
+```
+
+or
+```kotlin
+updraft {
+    urls = mapOf(
+        "ProdRelease" to listOf("your/prod/url"),
+        "StagingRelease" to listOf("your/url"),
+    )
 }
 ```
 
