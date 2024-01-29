@@ -138,7 +138,13 @@ class UpdraftPlugin implements Plugin<Project> {
     }
 
     private static String getReleaseNotes(Project project, variant) {
+        if (project.hasProperty('releaseNotes')) {
+            println("Using releaseNotes from gradle property")
+            return project.property('releaseNotes')
+        }
+
         if (project.updraft.releaseNotes != null) {
+            println("Using releaseNotes from updraft extension")
             project.updraft.releaseNotes
         } else {
             def variantFile = null
@@ -148,10 +154,13 @@ class UpdraftPlugin implements Plugin<Project> {
             def mainFile = new File(project.projectDir.toString() + "/src/main/updraft/release-notes.txt")
 
             if (variantFile != null && variantFile.exists()) {
+                println("Using releaseNotes from variant file")
                 variantFile.readLines().join("\n")
             } else if (mainFile.exists()) {
+                println("Using releaseNotes from main file")
                 mainFile.readLines().join("\n")
             } else {
+                println("passng releaseNotes last commit")
                 executeGitCommand("git log -1 --pretty=%B")
             }
         }

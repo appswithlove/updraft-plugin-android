@@ -100,6 +100,7 @@ In order to upload release notes, there are 3 options:
 1. Last commit message (default). If you don't specify anything, the release notes will contain the content of the latest commit message.
 2. Add parameter `releaseNotes` to `updraft` tag and pass in a string or function that generates a string.
 3. Add your release notes to `/src/main/updraft/release-notes.txt` or `/src/someFlavor/updraft/release-notes.txt`. If this file exists in either `main` or your current `flavour`, it will be taken instead of the git commit message.
+4. You can also pass releaseNotes as a runtime parameter `./gradlew updraftRelease -PreleaseNotes="your release notes"`
 
 
 ## Debug
