@@ -106,12 +106,14 @@ class UpdraftPlugin implements Plugin<Project> {
         for (String url in urls) {
             //Build and execute of the curl command for Updraft upload
 
+            println("Curl command --> curl -X PUT -F app=@${file} -F build_type=Gradle ${gitBranch} ${gitUrl} ${gitTags} ${gitCommit} ${whatsNew} ${url}")
+
             new ByteArrayOutputStream().withStream { os ->
                 def result = project.exec {
                     executable 'curl'
                     args '-X', 'PUT',
-                            '-F', "app=@${file}",
-                            '-F', "build_type=Gradle",
+                            '-F', "\"app=@${file}\"",
+                            '-F', "\"build_type=Gradle\"",
                             gitBranch,
                             gitUrl,
                             gitTags,
@@ -196,7 +198,7 @@ class UpdraftPlugin implements Plugin<Project> {
         if (text.isBlank() || text.isEmpty()) {
             ""
         } else {
-            "-F ${name}=${text} "
+            "-F \"${name}=${text}\" "
         }
     }
 }
