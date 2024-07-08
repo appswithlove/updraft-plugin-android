@@ -83,7 +83,11 @@ class UpdraftPlugin implements Plugin<Project> {
         def gitTags = createCurlParam(executeGitCommand("git describe --tags"), "custom_tags")
         def gitCommit = createCurlParam(executeGitCommand("git rev-parse HEAD"), "custom_commit")
         def gitUrl = createCurlParam(executeGitCommand("git config --get remote.origin.url"), "custom_URL")
-        def whatsNew = createCurlParam(getReleaseNotes(project, variant), "whats_new")
+
+        def releaseNotes = getReleaseNotes(project, variant)
+        println("releaseNotes: $releaseNotes")
+
+        def whatsNew = createCurlParam(releaseNotes, "whats_new")
 
         def urls = project.updraft.urls[variant.name.capitalize()]
 
@@ -145,7 +149,7 @@ class UpdraftPlugin implements Plugin<Project> {
 
         if (project.updraft.releaseNotes != null) {
             println("Using releaseNotes from updraft extension")
-            project.updraft.releaseNotes
+            return project.updraft.releaseNotes
         } else {
             def variantFile = null
             if (variant.productFlavors.size() > 0) {
@@ -155,13 +159,13 @@ class UpdraftPlugin implements Plugin<Project> {
 
             if (variantFile != null && variantFile.exists()) {
                 println("Using releaseNotes from variant file")
-                variantFile.readLines().join("\n")
+                return variantFile.readLines().join("\n")
             } else if (mainFile.exists()) {
                 println("Using releaseNotes from main file")
-                mainFile.readLines().join("\n")
+                return mainFile.readLines().join("\n")
             } else {
-                println("passng releaseNotes last commit")
-                executeGitCommand("git log -1 --pretty=%B")
+                println("Using releaseNotes last commit")
+                return executeGitCommand("git log -1 --pretty=%B")
             }
         }
     }
@@ -189,7 +193,7 @@ class UpdraftPlugin implements Plugin<Project> {
     }
 
     private static String createCurlParam(String text, String name) {
-        if (text.isEmpty()) {
+        if (text.isBlank() || text.isEmpty()) {
             ""
         } else {
             "-F ${name}=${text} "
