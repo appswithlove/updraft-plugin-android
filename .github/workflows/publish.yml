@@ -23,7 +23,7 @@ jobs:
         run: ./gradlew publish
 
       - name: Close Repository
-        run: ./gradlew closeAndReleaseRepository
+        run: ./gradlew releaseRepository
 
       - name: Publish to Gradle Plugin Portal
         run: ./gradlew publishPlugins
