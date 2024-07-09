@@ -85,8 +85,6 @@ class UpdraftPlugin implements Plugin<Project> {
         def gitUrl = createCurlParam(executeGitCommand("git config --get remote.origin.url"), "custom_URL")
 
         def releaseNotes = getReleaseNotes(project, variant)
-        println("releaseNotes: $releaseNotes")
-
         def whatsNew = createCurlParam(releaseNotes, "whats_new")
 
         def urls = project.updraft.urls[variant.name.capitalize()]
@@ -105,24 +103,24 @@ class UpdraftPlugin implements Plugin<Project> {
 
         for (String url in urls) {
             //Build and execute of the curl command for Updraft upload
-
-            println("Curl command --> curl -X PUT -F app=@${file} -F build_type=Gradle ${gitBranch} ${gitUrl} ${gitTags} ${gitCommit} ${whatsNew} ${url}")
+            List<String> curlArgs = [
+                    '-X', 'PUT',
+                    '-F', "app=@${file}",
+                    '-F', "build_type=Gradle",
+                    gitBranch,
+                    gitUrl,
+                    gitTags,
+                    gitCommit,
+                    whatsNew,
+                    url
+            ].findAll { it != '' } // Filter out empty strings
 
             new ByteArrayOutputStream().withStream { os ->
-                def result = project.exec {
+                project.exec {
                     executable 'curl'
-                    args '-X', 'PUT',
-                            '-F', "\"app=@${file}\"",
-                            '-F', "\"build_type=Gradle\"",
-                            gitBranch,
-                            gitUrl,
-                            gitTags,
-                            gitCommit,
-                            whatsNew,
-                            url
+                    args curlArgs
                     standardOutput os
                 }
-
 
                 def execResponse = new JsonSlurperClassic().parseText(os.toString())
 
@@ -198,7 +196,7 @@ class UpdraftPlugin implements Plugin<Project> {
         if (text.isBlank() || text.isEmpty()) {
             ""
         } else {
-            "-F \"${name}=${text}\" "
+            "-F ${name}=${text} "
         }
     }
 }
