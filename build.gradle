@@ -18,7 +18,7 @@ buildscript {
         // check the Build window for output.
 
         File directory = new File(getRootDir(), "/lib/build/libs")
-        File[] contents = directory.listFiles();
+        File[] contents = directory.listFiles()
         if (contents == null || contents.length == 0) {
             println("updraft - mavenCentral version")
             classpath "com.appswithlove.updraft:updraft:2.2.3"
