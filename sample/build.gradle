@@ -1,19 +1,21 @@
-import java.util.regex.Matcher
-import java.util.regex.Pattern
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.appswithlove.updraft'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 android {
-    compileSdk 33
+    namespace = 'com.appswithlove.sample'
+    compileSdk = 36
 
     defaultConfig {
         applicationId "com.appswithlove.updraft.sample"
         minSdk 29
-        targetSdk 33
+        targetSdk 36
         versionCode 1
         versionName "1.0"
 
@@ -21,7 +23,6 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
-
     }
 
     flavorDimensions "main"
@@ -40,75 +41,49 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = '1.8'
+
+    tasks.withType(KotlinJvmCompile).configureEach {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_1_8
+            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+        }
     }
+
     buildFeatures {
         compose true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
     }
+
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-    namespace 'com.appswithlove.sample'
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.16.0'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation "androidx.compose.compiler:compiler:$compose_version"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
-    implementation 'androidx.activity:activity-compose:1.4.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2'
+    implementation 'androidx.activity:activity-compose:1.10.1'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 }
 
-
 updraft {
     urls['StageDebug'] = ["https://getupdraft.com/api/app_upload/eaa30e534f824fde8b9a0d8b7071834a/65ae1e0f4b1f4b1898c9c956c4486289/"]
     urls['ProdDebug'] = ["https://getupdraft.com/api/app_upload/3e49bd8893624de0a44d919fa05b7b6c/65ae1e0f4b1f4b1898c9c956c4486289/"]
-    releaseNotes = gitNotes(gitLatestTag())
-}
-
-
-String gitLatestTag() {
-    def hashStdOut = new ByteArrayOutputStream()
-    exec {
-        commandLine "git", "tag", "--sort=-committerdate"
-        standardOutput = hashStdOut
-    }
-    return hashStdOut.toString().split("\n").first().trim()
-}
-
-String gitNotes(String latestTag) {
-    Pattern pattern = Pattern.compile("updraft(.*)(Release|Debug)");
-    Matcher matcher = pattern.matcher(gradle.startParameter.taskNames[0] ?: "")
-    matcher.find()
-    try {
-        println("Matches " + matcher.group(1))
-    } catch (Exception exception) {
-
-    }
-
-    def source = (latestTag) ? "$latestTag..HEAD" : "--max-count=20"
-
-    def hashStdOut = new ByteArrayOutputStream()
-    exec {
-        commandLine "git", "log", "--pretty=* %s (%an) [%h]", source
-        standardOutput = hashStdOut
-    }
-    return hashStdOut.toString().trim()
 }
