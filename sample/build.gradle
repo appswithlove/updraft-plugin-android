@@ -84,6 +84,6 @@ dependencies {
 }
 
 updraft {
-    urls['StageDebug'] = ["https://getupdraft.com/api/app_upload/eaa30e534f824fde8b9a0d8b7071834a/65ae1e0f4b1f4b1898c9c956c4486289/"]
-    urls['ProdDebug'] = ["https://getupdraft.com/api/app_upload/3e49bd8893624de0a44d919fa05b7b6c/65ae1e0f4b1f4b1898c9c956c4486289/"]
+    urls['StageDebug'] = ["https://app.getupdraft.com/api/app_upload/eaa30e534f824fde8b9a0d8b7071834a/65ae1e0f4b1f4b1898c9c956c4486289/"]
+    urls['ProdDebug'] = ["https://app.getupdraft.com/api/app_upload/3e49bd8893624de0a44d919fa05b7b6c/65ae1e0f4b1f4b1898c9c956c4486289/"]
 }

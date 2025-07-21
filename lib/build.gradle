@@ -38,13 +38,13 @@ gradlePlugin  {
     vcsUrl = project.findProperty("POM_SCM_URL") ?: ""
 
     plugins {
-        loco {
+        updraft {
             id = project.findProperty("GROUP") ?: ""
             implementationClass = project.findProperty("IMPLEMENTATION_CLASS") ?: ""
             displayName = project.findProperty("POM_NAME") ?: ""
             description = project.findProperty("POM_DESCRIPTION") ?: ""
             version = project.findProperty("VERSION_NAME") ?: ""
-            tags = ['loco', 'localization', 'android']
+            tags = ['updraft', 'android']
         }
     }
 }
