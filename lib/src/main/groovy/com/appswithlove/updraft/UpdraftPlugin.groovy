@@ -4,23 +4,51 @@ import groovy.json.JsonSlurperClassic
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
 
 /**
  * A plugin for uploading apk files to updraft.*/
 class UpdraftPlugin implements Plugin<Project> {
+
+    private final ExecOperations execOps
+
+    @Inject
+    UpdraftPlugin(ExecOperations execOperations) {
+        this.execOps = execOperations
+    }
+
     @Override
     void apply(Project project) {
         project.extensions.create('updraft', UpdraftExtension.class)
         project.android.applicationVariants.all { variant ->
 
-            //Creates a task for every available build variant / flavor
-            project.tasks.create("updraft${variant.name.capitalize()}") {
+            def plugin = this
+            String variantName = variant.name
+            String variantNameCapitalized = variantName.capitalize()
+            String basePath = getProject().getProjectDir().getAbsolutePath()
+            String filename = variant.outputs[0].outputFile
+
+            def urls = project.updraft.urls[variantNameCapitalized]
+            def gitBranchProvider = project.providers.of(GitBranchValueSource.class) {}
+            def gitTagsProvider = project.providers.of(GitTagsValueSource.class) {}
+            def gitCommitProvider = project.providers.of(GitCommitValueSource.class) {}
+            def gitUrlProvider = project.providers.of(GitUrlValueSource.class) {}
+            String releaseNotes = getReleaseNotes(project, variant)
+            String whatsNew = createCurlParam(releaseNotes, "whats_new")
+
+            // Registers a task for every available build variant / flavor
+            project.tasks.register("updraft${variantNameCapitalized}") {
                 // Declares that the project runs after the build, not before.
                 // If not stated, it will run at every gradle sync.
+
+                String gitBranch = createCurlParam(gitBranchProvider.get(), "custom_branch")
+                String gitTags = createCurlParam(gitTagsProvider.get(), "custom_tags")
+                String gitCommit = createCurlParam(gitCommitProvider.get(), "custom_commit")
+                String gitUrl = createCurlParam(gitUrlProvider.get(), "custom_URL")
+
                 doLast {
                     // APK
-                    String filename = variant.outputs[0].outputFile
-
                     def apkFile = new File(filename)
                     String fileWithoutExt = apkFile.name.take(apkFile.name.lastIndexOf('.'))
 
@@ -34,26 +62,30 @@ class UpdraftPlugin implements Plugin<Project> {
                     }
 
                     if (apkFile != null && !apkFile.exists()) {
-                        throw new GradleException("Could not find a build artifact. (Make sure to run assemble${variant.name.capitalize()} before)")
+                        throw new GradleException("Could not find a build artifact. (Make sure to run assemble${variantNameCapitalized} before)")
                     }
 
-                    upload(project, variant, apkFile, filename)
+                    plugin.upload(apkFile, urls, gitBranch, gitTags, gitCommit, gitUrl, whatsNew)
                 }
             }
 
-            //Creates a task for every available build variant / flavor
-            project.tasks.create("updraftBundle${variant.name.capitalize()}") {
+            // Registers a task for every available build variant / flavor
+            project.tasks.register("updraftBundle${variantNameCapitalized}") {
                 // Declares that the project runs after the build, not before.
                 // If not stated, it will run at every gradle sync.
-                doLast {
-                    String filename = variant.outputs[0].outputFile
 
+                String gitBranch = createCurlParam(gitBranchProvider.get(), "custom_branch")
+                String gitTags = createCurlParam(gitTagsProvider.get(), "custom_tags")
+                String gitCommit = createCurlParam(gitCommitProvider.get(), "custom_commit")
+                String gitUrl = createCurlParam(gitUrlProvider.get(), "custom_URL")
+
+                doLast {
                     def apkFile = new File(filename)
                     String fileWithoutExt = apkFile.name.take(apkFile.name.lastIndexOf('.'))
 
                     // AAB
-                    def basePath = getProject().getProjectDir().getAbsolutePath()
-                    def bundlePath = "${basePath}/build/outputs/bundle/${variant.name}/${fileWithoutExt}.aab"
+                    def bundlePath =
+                            "${basePath}/build/outputs/bundle/${variantName}/${fileWithoutExt}.aab"
 
                     def aabFile = new File(bundlePath)
                     if (aabFile != null && !aabFile.exists()) {
@@ -67,30 +99,20 @@ class UpdraftPlugin implements Plugin<Project> {
                     }
 
                     if (aabFile != null && !aabFile.exists()) {
-                        throw new GradleException("Could not find a build artifact. (Make sure to run bundle${variant.name.capitalize()} before). \n We tried following location ${bundlePath}")
+                        throw new GradleException("Could not find a build artifact. (Make sure to run bundle${variantNameCapitalized} before). \n We tried following location ${bundlePath}")
                     }
 
-
-                    upload(project, variant, aabFile, bundlePath)
+                    plugin.upload(aabFile, urls, gitBranch, gitTags, gitCommit, gitUrl, whatsNew)
                 }
             }
         }
     }
 
-    private void upload(Project project, variant, file, String filename) {
-        // Getting git information
-        def gitBranch = createCurlParam(executeGitCommand("git rev-parse --abbrev-ref HEAD"), "custom_branch")
-        def gitTags = createCurlParam(executeGitCommand("git describe --tags"), "custom_tags")
-        def gitCommit = createCurlParam(executeGitCommand("git rev-parse HEAD"), "custom_commit")
-        def gitUrl = createCurlParam(executeGitCommand("git config --get remote.origin.url"), "custom_URL")
-
-        def releaseNotes = getReleaseNotes(project, variant)
-        def whatsNew = createCurlParam(releaseNotes, "whats_new")
-
-        def urls = project.updraft.urls[variant.name.capitalize()]
-
+    private void upload(file, urls, gitBranch, gitTags, gitCommit, gitUrl, whatsNew) {
         if (urls == null || urls.isEmpty()) {
-            throw new GradleException('There was no url provided for this buildVariant. Please check for typos.')
+            throw new GradleException(
+                    'There was no url provided for this buildVariant. Please check for typos.'
+            )
         }
 
         if (urls instanceof String) {
@@ -116,7 +138,7 @@ class UpdraftPlugin implements Plugin<Project> {
             ].findAll { it != '' } // Filter out empty strings
 
             new ByteArrayOutputStream().withStream { os ->
-                project.exec {
+                execOps.exec {
                     executable 'curl'
                     args curlArgs
                     standardOutput os
@@ -165,31 +187,22 @@ class UpdraftPlugin implements Plugin<Project> {
                 return mainFile.readLines().join("\n")
             } else {
                 println("Using releaseNotes last commit")
-                return executeGitCommand("git log -1 --pretty=%B")
+                def result = project.providers.exec {
+                    commandLine("git", "log", "-1", "--pretty=%B")
+                }.standardOutput.asText
+                return result.get()
             }
         }
     }
 
-    private void ok(String publicUrl) {
+    private static void ok(String publicUrl) {
         println()
         println("--------------------------------------")
-        println("Your App was sucessfully updrafted!")
+        println("Your App was successfully updrafted!")
         if (publicUrl != null) {
             println("Get it here -> $publicUrl")
         }
         println("--------------------------------------")
-    }
-
-    private static String executeGitCommand(bashUrl) {
-        def error = null
-        def command = bashUrl.execute()
-        def outputUrlStream = new StringBuffer()
-        command.waitForProcessOutput(outputUrlStream, error)
-        if (error == null && outputUrlStream.size() > 0) {
-            outputUrlStream.toString()
-        } else {
-            ""
-        }
     }
 
     private static String createCurlParam(String text, String name) {
