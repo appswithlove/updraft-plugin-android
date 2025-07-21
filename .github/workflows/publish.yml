@@ -26,7 +26,7 @@ jobs:
           ORG_GRADLE_PROJECT_gradlePublishSecret: ${{ secrets.GRADLE_PUBLISH_SECRET }}
 
       - name: Publish to Maven Central
-        run: ./gradlew :lib:publish
+        run: ./gradlew :lib:publish --no-configuration-cache
 
       - name: Close Repository
         run: ./gradlew :lib:releaseRepository
