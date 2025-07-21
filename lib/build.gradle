@@ -33,13 +33,14 @@ mavenPublishing {
     configure(new GradlePlugin(new JavadocJar.Javadoc(), true))
 }
 
-pluginBundle {
+gradlePlugin  {
     website = project.findProperty("POM_URL") ?: ""
     vcsUrl = project.findProperty("POM_SCM_URL") ?: ""
 
     plugins {
         loco {
             id = project.findProperty("GROUP") ?: ""
+            implementationClass = 'com.appswithlove.loco.LocoPlugin'
             displayName = project.findProperty("POM_NAME") ?: ""
             description = project.findProperty("POM_DESCRIPTION") ?: ""
             version = project.findProperty("VERSION_NAME") ?: ""
