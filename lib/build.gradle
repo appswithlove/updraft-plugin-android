@@ -40,7 +40,7 @@ gradlePlugin  {
     plugins {
         loco {
             id = project.findProperty("GROUP") ?: ""
-            implementationClass = 'com.appswithlove.loco.LocoPlugin'
+            implementationClass = project.findProperty("IMPLEMENTATION_CLASS") ?: ""
             displayName = project.findProperty("POM_NAME") ?: ""
             description = project.findProperty("POM_DESCRIPTION") ?: ""
             version = project.findProperty("VERSION_NAME") ?: ""
