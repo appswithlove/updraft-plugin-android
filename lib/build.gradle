@@ -33,17 +33,25 @@ mavenPublishing {
     configure(new GradlePlugin(new JavadocJar.Javadoc(), true))
 }
 
+def pluginId = project.findProperty("GROUP") ?: ""
+def pluginImplementationClass = project.findProperty("IMPLEMENTATION_CLASS") ?: ""
+def pluginName = project.findProperty("POM_NAME") ?: ""
+def pluginDescription = project.findProperty("POM_DESCRIPTION") ?: ""
+def pluginVersion = project.findProperty("VERSION_NAME") ?: ""
+def pluginWebsite = project.findProperty("POM_URL") ?: ""
+def pluginVcsUrl = project.findProperty("POM_SCM_URL") ?: ""
+
 gradlePlugin  {
-    website = project.findProperty("POM_URL") ?: ""
-    vcsUrl = project.findProperty("POM_SCM_URL") ?: ""
+    website = pluginWebsite
+    vcsUrl = pluginVcsUrl
 
     plugins {
         updraft {
-            id = project.findProperty("GROUP") ?: ""
-            implementationClass = project.findProperty("IMPLEMENTATION_CLASS") ?: ""
-            displayName = project.findProperty("POM_NAME") ?: ""
-            description = project.findProperty("POM_DESCRIPTION") ?: ""
-            version = project.findProperty("VERSION_NAME") ?: ""
+            id = pluginId
+            implementationClass = pluginImplementationClass
+            displayName = pluginName
+            description = pluginDescription
+            version = pluginVersion
             tags = ['updraft', 'android']
         }
     }
