@@ -48,7 +48,7 @@ or
   id("com.appswithlove.updraft")
 ```
 
-3.Add one or multiple `urls['YOURPRODUCTFLAVOUR']` wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. [app.getupdraft.com/api_upload/.../.../]())
+3.Add one or multiple `urls['YOURPRODUCTFLAVOUR']` wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. [https://app.getupdraft.com/api_upload/.../.../]())
 With this, the plugin knows to which updraft app your apk should be uploaded.
 
 The part `YourBuildVariant` should be replaced by the exact name your build variant. For example: 
