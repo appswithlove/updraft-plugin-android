@@ -187,10 +187,14 @@ class UpdraftPlugin implements Plugin<Project> {
                 return mainFile.readLines().join("\n")
             } else {
                 println("Using releaseNotes last commit")
-                def result = project.providers.exec {
-                    commandLine("git", "log", "-1", "--pretty=%B")
-                }.standardOutput.asText
-                return result.get()
+                try {
+                    def result = project.providers.exec {
+                        commandLine("git", "log", "-1", "--pretty=%B")
+                    }.standardOutput.asText
+                    return result.get()
+                } catch (Exception ignored) {
+                    return ""
+                }
             }
         }
     }
