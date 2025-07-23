@@ -24,3 +24,9 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Validate Maven Central publishing setup
+        run: ./gradlew :lib:publishToMavenLocal --dry-run
+
+      - name: Validate Gradle Plugin Portal publishing setup
+        run: ./gradlew :lib:validatePlugins
