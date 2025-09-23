@@ -42,6 +42,9 @@ class UpdraftPlugin implements Plugin<Project> {
                 }
                 return null
             }
+            def apkFile = apkFileProvider.flatMap { file ->
+                file ? project.layout.file(project.provider { file }) : project.objects.fileProperty()
+            }
 
             def aabFileProvider = project.provider {
                 def buildDir = project.layout.buildDirectory.get().asFile
@@ -52,14 +55,12 @@ class UpdraftPlugin implements Plugin<Project> {
                 }
                 return null
             }
+            def aabFile = aabFileProvider.flatMap { file ->
+                file ? project.layout.file(project.provider { file }) : project.objects.fileProperty()
+            }
 
             // Registers a task for every available build variant / flavor
             project.tasks.register("updraft${variantNameCapitalized}", UpdraftTask) {
-
-                def apkFile = apkFileProvider.flatMap { file ->
-                    file ? project.layout.file(project.provider { file }) : project.objects.fileProperty()
-                }
-
                 outputFile.set(apkFile)
                 isBundle.set(false)
                 basePath.set(projectBasePath)
@@ -80,12 +81,7 @@ class UpdraftPlugin implements Plugin<Project> {
             }
 
             // Registers a task for every available build variant / flavor
-            project.tasks.register("updraftBundle${variantNameCapitalized}", UpdraftTask) { task ->
-
-                def aabFile = aabFileProvider.flatMap { file ->
-                    file ? project.layout.file(project.provider { file }) : project.objects.fileProperty()
-                }
-
+            project.tasks.register("updraftBundle${variantNameCapitalized}", UpdraftTask) {
                 outputFile.set(aabFile)
                 isBundle.set(true)
                 basePath.set(projectBasePath)
