@@ -1,163 +1,117 @@
 package com.appswithlove.updraft
 
-import groovy.json.JsonSlurperClassic
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.process.ExecOperations
-import javax.inject.Inject
 
 /**
  * A plugin for uploading apk files to updraft.*/
 class UpdraftPlugin implements Plugin<Project> {
-
-    private final ExecOperations execOps
-
-    @Inject
-    UpdraftPlugin(ExecOperations execOperations) {
-        this.execOps = execOperations
-    }
 
     @Override
     void apply(Project project) {
         project.extensions.create('updraft', UpdraftExtension.class)
         project.android.applicationVariants.all { variant ->
 
-            def plugin = this
             String variantName = variant.name
             String variantNameCapitalized = variantName.capitalize()
-            String basePath = getProject().getProjectDir().getAbsolutePath()
-            String filename = variant.outputs[0].outputFile
+            String projectBasePath = getProject().getProjectDir().getAbsolutePath()
 
-            def urls = project.updraft.urls[variantNameCapitalized]
+            def uploadUrlsProvider = project.providers.provider { project.updraft.urls }
+            def uploadUrls = uploadUrlsProvider.map { urlsMap ->
+                def urlsForVariant = urlsMap[variantNameCapitalized]
+                if (urlsForVariant == null) {
+                    return []
+                }
+                if (urlsForVariant instanceof String) {
+                    return [urlsForVariant]
+                }
+                return urlsForVariant
+            }
+
             def gitBranchProvider = project.providers.of(GitBranchValueSource.class) {}
             def gitTagsProvider = project.providers.of(GitTagsValueSource.class) {}
             def gitCommitProvider = project.providers.of(GitCommitValueSource.class) {}
             def gitUrlProvider = project.providers.of(GitUrlValueSource.class) {}
-            String releaseNotes = getReleaseNotes(project, variant)
-            String whatsNew = createCurlParam(releaseNotes, "whats_new")
+            def releaseNotesProvider = project.providers.provider { getReleaseNotes(project, variant) }
+
+            def apkFileProvider = project.provider {
+                def buildDir = project.layout.buildDirectory.get().asFile
+                def apkDir = new File(buildDir, "outputs/apk/${variant.flavorName}/${variant.buildType.name}")
+
+                if (apkDir.exists() && apkDir.isDirectory()) {
+                    def apkFiles = apkDir.listFiles({ file -> file.name.endsWith(".apk") } as FileFilter)
+
+                    if (apkFiles && apkFiles.size() > 1) {
+                        throw new GradleException("More than one .apk file exists in ${apkDir}: ${apkFiles*.name}")
+                    }
+
+                    return apkFiles ? apkFiles[0] : null
+                }
+                return null
+            }
+            def apkFile = apkFileProvider.flatMap { file ->
+                file ? project.layout.file(project.provider { file }) : project.objects.fileProperty()
+            }
+
+            def aabFileProvider = project.provider {
+                def buildDir = project.layout.buildDirectory.get().asFile
+                def bundleDir = new File(buildDir, "outputs/bundle/${variantName}")
+
+                if (bundleDir.exists() && bundleDir.isDirectory()) {
+                    def aabFiles = bundleDir.listFiles({ file -> file.name.endsWith(".aab") } as FileFilter)
+
+                    if (aabFiles && aabFiles.size() > 1) {
+                        throw new GradleException("More than one .aab file exists in ${bundleDir}: ${aabFiles*.name}")
+                    }
+
+                    return aabFiles ? aabFiles[0] : null
+                }
+                return null
+            }
+            def aabFile = aabFileProvider.flatMap { file ->
+                file ? project.layout.file(project.provider { file }) : project.objects.fileProperty()
+            }
 
             // Registers a task for every available build variant / flavor
-            project.tasks.register("updraft${variantNameCapitalized}") {
-                // Declares that the project runs after the build, not before.
-                // If not stated, it will run at every gradle sync.
+            project.tasks.register("updraft${variantNameCapitalized}", UpdraftTask) {
+                outputFile.set(apkFile)
+                isBundle.set(false)
+                basePath.set(projectBasePath)
+                currentVariantName.set(variantName)
+                urls.set(uploadUrls)
+                gitBranch.set(gitBranchProvider)
+                gitTags.set(gitTagsProvider)
+                gitCommit.set(gitCommitProvider)
+                gitUrl.set(gitUrlProvider)
+                releaseNotes.set(releaseNotesProvider)
 
-                String gitBranch = createCurlParam(gitBranchProvider.get(), "custom_branch")
-                String gitTags = createCurlParam(gitTagsProvider.get(), "custom_tags")
-                String gitCommit = createCurlParam(gitCommitProvider.get(), "custom_commit")
-                String gitUrl = createCurlParam(gitUrlProvider.get(), "custom_URL")
-
-                doLast {
-                    // APK
-                    def apkFile = new File(filename)
-                    String fileWithoutExt = apkFile.name.take(apkFile.name.lastIndexOf('.'))
-
-                    if (apkFile != null && !apkFile.exists()) {
-                        def apkFolder = new File(apkFile.getParent())
-                        for (File currentFile in apkFolder.listFiles()) {
-                            if (currentFile.getName().startsWith(fileWithoutExt)) {
-                                apkFile = currentFile
-                            }
-                        }
+                doFirst {
+                    def outputFile = apkFile.getOrNull()?.asFile
+                    if (outputFile == null || !outputFile.exists()) {
+                        throw new GradleException("Could not find a build artifact. (Make sure to run assemble${variantNameCapitalized} task first)")
                     }
-
-                    if (apkFile != null && !apkFile.exists()) {
-                        throw new GradleException("Could not find a build artifact. (Make sure to run assemble${variantNameCapitalized} before)")
-                    }
-
-                    plugin.upload(apkFile, urls, gitBranch, gitTags, gitCommit, gitUrl, whatsNew)
                 }
             }
 
             // Registers a task for every available build variant / flavor
-            project.tasks.register("updraftBundle${variantNameCapitalized}") {
-                // Declares that the project runs after the build, not before.
-                // If not stated, it will run at every gradle sync.
+            project.tasks.register("updraftBundle${variantNameCapitalized}", UpdraftTask) {
+                outputFile.set(aabFile)
+                isBundle.set(true)
+                basePath.set(projectBasePath)
+                currentVariantName.set(variantName)
+                urls.set(uploadUrls)
+                gitBranch.set(gitBranchProvider)
+                gitTags.set(gitTagsProvider)
+                gitCommit.set(gitCommitProvider)
+                gitUrl.set(gitUrlProvider)
+                releaseNotes.set(releaseNotesProvider)
 
-                String gitBranch = createCurlParam(gitBranchProvider.get(), "custom_branch")
-                String gitTags = createCurlParam(gitTagsProvider.get(), "custom_tags")
-                String gitCommit = createCurlParam(gitCommitProvider.get(), "custom_commit")
-                String gitUrl = createCurlParam(gitUrlProvider.get(), "custom_URL")
-
-                doLast {
-                    def apkFile = new File(filename)
-                    String fileWithoutExt = apkFile.name.take(apkFile.name.lastIndexOf('.'))
-
-                    // AAB
-                    def bundlePath =
-                            "${basePath}/build/outputs/bundle/${variantName}/${fileWithoutExt}.aab"
-
-                    def aabFile = new File(bundlePath)
-                    if (aabFile != null && !aabFile.exists()) {
-                        def aabFolder = new File(aabFile.getParent())
-                        for (File currentFile in aabFolder.listFiles()) {
-                            println("file $currentFile.path")
-                            if (currentFile.getName().startsWith(fileWithoutExt)) {
-                                aabFile = currentFile
-                            }
-                        }
+                doFirst {
+                    def outputFile = aabFile.getOrNull()?.asFile
+                    if (outputFile == null || !outputFile.exists()) {
+                        throw new GradleException("Could not find a build artifact. (Make sure to run bundle${variantNameCapitalized} task first)")
                     }
-
-                    if (aabFile != null && !aabFile.exists()) {
-                        throw new GradleException("Could not find a build artifact. (Make sure to run bundle${variantNameCapitalized} before). \n We tried following location ${bundlePath}")
-                    }
-
-                    plugin.upload(aabFile, urls, gitBranch, gitTags, gitCommit, gitUrl, whatsNew)
-                }
-            }
-        }
-    }
-
-    private void upload(file, urls, gitBranch, gitTags, gitCommit, gitUrl, whatsNew) {
-        if (urls == null || urls.isEmpty()) {
-            throw new GradleException(
-                    'There was no url provided for this buildVariant. Please check for typos.'
-            )
-        }
-
-        if (urls instanceof String) {
-            println("--------------------------------------")
-            println("Url was not wrapped in array. Doing it for you. :)")
-            println("url --> [url]")
-            println("--------------------------------------")
-            urls = [urls]
-        }
-
-        for (String url in urls) {
-            //Build and execute of the curl command for Updraft upload
-            List<String> curlArgs = [
-                    '-X', 'PUT',
-                    '-F', "app=@${file}",
-                    '-F', "build_type=Gradle",
-                    gitBranch,
-                    gitUrl,
-                    gitTags,
-                    gitCommit,
-                    whatsNew,
-                    url
-            ].findAll { it != '' } // Filter out empty strings
-
-            new ByteArrayOutputStream().withStream { os ->
-                execOps.exec {
-                    executable 'curl'
-                    args curlArgs
-                    standardOutput os
-                }
-
-                def execResponse = new JsonSlurperClassic().parseText(os.toString())
-
-                if (execResponse instanceof HashMap && execResponse.size() > 0) {
-                    if (execResponse.containsKey("success") && execResponse["success"] == "ok") {
-                        def publicUrl = execResponse["public_link"]
-                        ok(publicUrl)
-                    } else if (execResponse.containsKey("detail") && execResponse["detail"] == "Not found.") {
-                        throw new GradleException('Could not updraft to the given url. Please recheck that.')
-                    } else {
-                        throw new GradleException(os.toString())
-                    }
-                } else {
-                    println(execResponse)
-                    ok(null)
                 }
             }
         }
@@ -196,24 +150,6 @@ class UpdraftPlugin implements Plugin<Project> {
                     return ""
                 }
             }
-        }
-    }
-
-    private static void ok(String publicUrl) {
-        println()
-        println("--------------------------------------")
-        println("Your App was successfully updrafted!")
-        if (publicUrl != null) {
-            println("Get it here -> $publicUrl")
-        }
-        println("--------------------------------------")
-    }
-
-    private static String createCurlParam(String text, String name) {
-        if (text.isBlank() || text.isEmpty()) {
-            ""
-        } else {
-            "-F ${name}=${text} "
         }
     }
 }
