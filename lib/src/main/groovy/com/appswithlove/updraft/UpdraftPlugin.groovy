@@ -36,9 +36,17 @@ class UpdraftPlugin implements Plugin<Project> {
             def releaseNotesProvider = project.providers.provider { getReleaseNotes(project, variant) }
 
             def apkFileProvider = project.provider {
-                def file = variant.outputs.find { it.outputFile != null && it.outputFile.name.endsWith('.apk') }?.outputFile
-                if (file.exists()) {
-                    return file
+                def buildDir = project.layout.buildDirectory.get().asFile
+                def apkDir = new File(buildDir, "outputs/apk/${variant.flavorName}/${variant.buildType.name}")
+
+                if (apkDir.exists() && apkDir.isDirectory()) {
+                    def apkFiles = apkDir.listFiles({ file -> file.name.endsWith(".apk") } as FileFilter)
+
+                    if (apkFiles && apkFiles.size() > 1) {
+                        throw new GradleException("More than one .apk file exists in ${apkDir}: ${apkFiles*.name}")
+                    }
+
+                    return apkFiles ? apkFiles[0] : null
                 }
                 return null
             }
@@ -49,8 +57,14 @@ class UpdraftPlugin implements Plugin<Project> {
             def aabFileProvider = project.provider {
                 def buildDir = project.layout.buildDirectory.get().asFile
                 def bundleDir = new File(buildDir, "outputs/bundle/${variantName}")
+
                 if (bundleDir.exists() && bundleDir.isDirectory()) {
                     def aabFiles = bundleDir.listFiles({ file -> file.name.endsWith(".aab") } as FileFilter)
+
+                    if (aabFiles && aabFiles.size() > 1) {
+                        throw new GradleException("More than one .aab file exists in ${bundleDir}: ${aabFiles*.name}")
+                    }
+
                     return aabFiles ? aabFiles[0] : null
                 }
                 return null
