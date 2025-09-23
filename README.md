@@ -12,7 +12,7 @@ Preconditions:
  
 1.Add the code below to you `build.gradle` file in the project root folder.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.appswithlove.updraft/updraft)
+[![Maven Central](https://maven-badges.sml.io/maven-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.sml.io/maven-central/com.appswithlove.updraft/updraft)
 
 ```groovy
 buildscript {
