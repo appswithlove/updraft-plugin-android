@@ -10,19 +10,19 @@ In order to use the plugin follow those steps:
 Preconditions:
 - Uses Java 11
  
-1.Add the code below to you `build.gradle` file in the project root folder.
+1. Add the code below to you `build.gradle` file in the project root folder.
 
 [![Maven Central](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft)
 
 ```groovy
 buildscript {
   repositories {
-    ...
+    // ...
     mavenCentral()
   }
 
   dependencies {
-    ...
+    // ...
     classpath 'com.appswithlove.updraft:updraft:2.2.9'
   }
 }
@@ -36,7 +36,7 @@ plugins {
 }
 ```
 
-2.Apply the plugin in `app/build.gradle`
+2. Apply the plugin in `app/build.gradle`
 
 ```groovy
     id 'com.appswithlove.updraft'
@@ -48,7 +48,7 @@ or
   id("com.appswithlove.updraft")
 ```
 
-3.Add one or multiple `urls['YOURPRODUCTFLAVOUR']` wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. [https://app.getupdraft.com/api_upload/.../.../]())
+3. Add one or multiple `urls['YOURPRODUCTFLAVOUR']` wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. [https://app.getupdraft.com/api_upload/.../.../]())
 With this, the plugin knows to which updraft app your apk should be uploaded.
 
 The part `YourBuildVariant` should be replaced by the exact name your build variant. For example: 
@@ -71,7 +71,7 @@ updraft {
 }
 ```
 
-4.Done! 
+4. Done! 
 
 ## Usage
 After installing the plugin, you should be able to find the Gradle Updraft tasks in Android Studio. The naming is always `updraft` + buildVariant (`updraftBundle` + buildVariant for App Bundles). The appropriate url will be chosen as destination. There is 1 task for every available buildVariant.
@@ -111,11 +111,11 @@ In order to debug the plugin, `clean` -> `jar` -> `publishJarPublicationToMavenL
 buildscript {
 	repositories {
 		mavenLocal()
-		...
+		// ...
 	}
 	dependencies {
 	    classpath 'com.appswithlove.updraft:updraft:2.2.9'
-	    ...
+	    // ...
 	}
 }
 ```
