@@ -4,6 +4,9 @@ pluginManagement {
         google()
         mavenCentral()
     }
+    plugins {
+        kotlin("jvm") version "2.2.0"
+    }
 }
 
 dependencyResolutionManagement {
@@ -14,5 +17,6 @@ dependencyResolutionManagement {
     }
 }
 
-include ':sample'
-include ':lib'
+rootProject.name = "updraft-plugin-android"
+include(":sample")
+include(":lib")
