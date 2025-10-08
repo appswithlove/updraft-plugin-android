@@ -34,7 +34,8 @@ class UpdraftPlugin : Plugin<Project> {
             val gitCommitProvider = project.providers.of(GitCommitValueSource::class.java) {}
             val gitUrlProvider = project.providers.of(GitUrlValueSource::class.java) {}
             val flavors = variant.productFlavors.map { it.name }
-            val releaseNotesProvider = project.providers.provider { getReleaseNotes(project, flavors, updraftExtension) }
+            val releaseNotesProvider =
+                project.providers.provider { getReleaseNotes(project, flavors, updraftExtension) }
 
             // APK provider
             val apkFileProvider = project.provider {
@@ -42,7 +43,8 @@ class UpdraftPlugin : Plugin<Project> {
                 val apkDir = File(buildDir, "outputs/apk/$flavorName/$buildTypeName")
 
                 if (apkDir.exists() && apkDir.isDirectory) {
-                    val apkFiles = apkDir.listFiles { file -> file.name.endsWith(".apk") } ?: emptyArray()
+                    val apkFiles =
+                        apkDir.listFiles { file -> file.name.endsWith(".apk") } ?: emptyArray()
                     if (apkFiles.size > 1) {
                         throw GradleException("More than one .apk file exists in $apkDir: ${apkFiles.map { it.name }}")
                     }
@@ -60,7 +62,8 @@ class UpdraftPlugin : Plugin<Project> {
                 val bundleDir = File(buildDir, "outputs/bundle/$variantName")
 
                 if (bundleDir.exists() && bundleDir.isDirectory) {
-                    val aabFiles = bundleDir.listFiles { file -> file.name.endsWith(".aab") } ?: emptyArray()
+                    val aabFiles =
+                        bundleDir.listFiles { file -> file.name.endsWith(".aab") } ?: emptyArray()
                     if (aabFiles.size > 1) {
                         throw GradleException("More than one .aab file exists in $bundleDir: ${aabFiles.map { it.name }}")
                     }
@@ -73,7 +76,10 @@ class UpdraftPlugin : Plugin<Project> {
             }
 
             // Register APK task
-            project.tasks.register("updraft$variantNameCapitalized", UpdraftTask::class.java) { task ->
+            project.tasks.register(
+                "updraft$variantNameCapitalized",
+                UpdraftTask::class.java,
+            ) { task ->
                 task.outputFile.set(apkFile)
                 task.urls.set(uploadUrls)
                 task.gitBranch.set(gitBranchProvider)
@@ -91,7 +97,10 @@ class UpdraftPlugin : Plugin<Project> {
             }
 
             // Register AAB task
-            project.tasks.register("updraftBundle$variantNameCapitalized", UpdraftTask::class.java) { task ->
+            project.tasks.register(
+                "updraftBundle$variantNameCapitalized",
+                UpdraftTask::class.java,
+            ) { task ->
                 task.outputFile.set(aabFile)
                 task.urls.set(uploadUrls)
                 task.gitBranch.set(gitBranchProvider)
@@ -110,7 +119,11 @@ class UpdraftPlugin : Plugin<Project> {
         }
     }
 
-    private fun getReleaseNotes(project: Project, flavors: List<String>, updraftExtension: UpdraftExtension): String {
+    private fun getReleaseNotes(
+        project: Project,
+        flavors: List<String>,
+        updraftExtension: UpdraftExtension,
+    ): String {
         project.findProperty("releaseNotes")?.let {
             println("Using releaseNotes from gradle property")
             return it.toString()
@@ -126,7 +139,6 @@ class UpdraftPlugin : Plugin<Project> {
         } else {
             null
         }
-
         val mainFile = File("${project.projectDir}/src/main/updraft/release-notes.txt")
 
         return when {
@@ -134,10 +146,12 @@ class UpdraftPlugin : Plugin<Project> {
                 println("Using releaseNotes from variant file")
                 variantFile.readLines().joinToString("\n")
             }
+
             mainFile.exists() -> {
                 println("Using releaseNotes from main file")
                 mainFile.readLines().joinToString("\n")
             }
+
             else -> {
                 println("Using releaseNotes last commit")
                 try {

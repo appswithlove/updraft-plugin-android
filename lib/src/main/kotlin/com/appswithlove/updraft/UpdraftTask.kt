@@ -50,7 +50,6 @@ abstract class UpdraftTask : DefaultTask() {
             throw GradleException("There was no url provided for this buildVariant. Please check for typos.")
         }
 
-        // If somehow it's a single string (unlikely in Kotlin ListProperty), wrap it
         if (uploadUrls.size == 1 && uploadUrls[0].isNotBlank() && !uploadUrls[0].startsWith("http")) {
             println("--------------------------------------")
             println("Url was not wrapped in array. Doing it for you. :)")
@@ -92,7 +91,7 @@ abstract class UpdraftTask : DefaultTask() {
                         }
 
                         execResponse["detail"] == "Not found." -> {
-                            throw GradleException("Could not u to the given url. Please recheck that.")
+                            throw GradleException("Could not updraft to the given url. Please recheck that.")
                         }
 
                         else -> {
