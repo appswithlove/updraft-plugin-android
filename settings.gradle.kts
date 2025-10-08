@@ -4,9 +4,6 @@ pluginManagement {
         google()
         mavenCentral()
     }
-    plugins {
-        kotlin("jvm") version "2.2.0"
-    }
 }
 
 dependencyResolutionManagement {
