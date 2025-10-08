@@ -58,6 +58,16 @@ android {
     }
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
+kotlin {
+    jvmToolchain(11)
+}
+
 updraft {
     urls = mapOf(
         "StageDebug" to listOf("https://app.getupdraft.com/api_upload/.../.../"),
