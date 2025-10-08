@@ -44,6 +44,10 @@ java {
     }
 }
 
+kotlin {
+    jvmToolchain(11)
+}
+
 mavenPublishing {
     configure(GradlePlugin(javadocJar = JavadocJar.Javadoc(), sourcesJar = true))
 }
