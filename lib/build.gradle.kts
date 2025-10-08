@@ -11,9 +11,6 @@ plugins {
     kotlin("jvm")
 }
 
-group = property("GROUP") as String
-version = property("VERSION_NAME") as String
-
 dependencies {
     implementation(gradleApi())
     testImplementation(gradleTestKit())
@@ -48,12 +45,7 @@ java {
 }
 
 mavenPublishing {
-    configure(
-        GradlePlugin(
-            JavadocJar.Javadoc(),
-            true
-        )
-    )
+    configure(GradlePlugin(javadocJar = JavadocJar.Javadoc(), sourcesJar = true))
 }
 
 val pluginId: String = findProperty("GROUP") as String? ?: ""
