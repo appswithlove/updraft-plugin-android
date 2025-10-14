@@ -49,7 +49,12 @@ kotlin {
 }
 
 mavenPublishing {
-    configure(GradlePlugin(javadocJar = JavadocJar.Javadoc(), sourcesJar = true))
+    configure(
+        GradlePlugin(
+            javadocJar = JavadocJar.None(),
+            sourcesJar = true,
+        )
+    )
 }
 
 val pluginId: String = findProperty("GROUP") as String? ?: ""
@@ -59,9 +64,9 @@ val pluginVersion: String = findProperty("VERSION_NAME") as String? ?: ""
 val pluginWebsite: String = findProperty("POM_URL") as String? ?: ""
 val pluginVcsUrl: String = findProperty("POM_SCM_URL") as String? ?: ""
 
-pluginBundle {
-    website = pluginWebsite
-    vcsUrl = pluginVcsUrl
+gradlePlugin {
+    website.set(pluginWebsite)
+    vcsUrl.set(pluginVcsUrl)
 
     plugins {
         create("updraft") {
@@ -70,6 +75,7 @@ pluginBundle {
             description = pluginDescription
             version = pluginVersion
             tags = listOf("updraft", "android")
+            implementationClass = "com.appswithlove.updraft.UpdraftPlugin"
         }
     }
 }
