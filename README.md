@@ -12,18 +12,18 @@ Preconditions:
  
 1.Add the code below to you `build.gradle` file in the project root folder.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.appswithlove.updraft/updraft)
+[![Maven Central](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft)
 
 ```groovy
 buildscript {
   repositories {
-    ...
+    // ...
     mavenCentral()
   }
 
   dependencies {
-    ...
-    classpath 'com.appswithlove.updraft:updraft:2.2.9'
+    // ...
+    classpath 'com.appswithlove.updraft:updraft:2.3.0'
   }
 }
 ```
@@ -32,7 +32,7 @@ or
 
 ```kotlin
 plugins {
-  id("com.appswithlove.updraft") version "2.2.9"
+  id("com.appswithlove.updraft") version "2.3.0"
 }
 ```
 
@@ -111,11 +111,11 @@ In order to debug the plugin, `clean` -> `jar` -> `publishJarPublicationToMavenL
 buildscript {
 	repositories {
 		mavenLocal()
-		...
+		// ...
 	}
 	dependencies {
-	    classpath 'com.appswithlove.updraft:updraft:2.2.9'
-	    ...
+	    classpath 'com.appswithlove.updraft:updraft:2.3.0'
+	    // ...
 	}
 }
 ```

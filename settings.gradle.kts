@@ -14,5 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-include ':sample'
-include ':lib'
+rootProject.name = "updraft-plugin-android"
+include(":sample")
+include(":lib")
