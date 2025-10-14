@@ -1,6 +1,10 @@
 [versions]
 agp = "8.11.1"
 kotlin = "2.2.0"
+composeBom = "2025.10.00"
+activityCompose = "1.11.0"
+coreKtx = "1.17.0"
+lifecycleRuntimeKtx = "2.9.4"
 cglibNodep = "3.3.0"
 dokkaGradlePlugin = "2.0.0"
 junit = "4.13.2"
@@ -10,6 +14,14 @@ gradle-publish = "0.16.0"
 coveralls = "2.4.0"
 
 [libraries]
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+material = { module = "androidx.compose.material:material" }
+ui = { module = "androidx.compose.ui:ui" }
+ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 cglib-nodep = { module = "cglib:cglib-nodep", version.ref = "cglibNodep" }
 dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokkaGradlePlugin" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -21,6 +33,7 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.re
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 updraft = { id = "com.appswithlove.updraft", version.ref = "updraft" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publish" }
