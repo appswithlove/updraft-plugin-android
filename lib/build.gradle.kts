@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.GradlePlugin
 import com.vanniktech.maven.publish.JavadocJar
+import org.gradle.kotlin.dsl.signing
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -9,6 +10,7 @@ plugins {
     alias(libs.plugins.maven.publish)
     alias(libs.plugins.gradle.publish)
     kotlin("jvm")
+    signing
 }
 
 dependencies {
@@ -77,5 +79,14 @@ gradlePlugin {
             tags = listOf("updraft", "android")
             implementationClass = "com.appswithlove.updraft.UpdraftPlugin"
         }
+    }
+}
+
+signing {
+    val signingInMemoryKey = project.findProperty("signingInMemoryKey") as String?
+    val signingInMemoryPassword = project.findProperty("signingInMemoryPassword") as String?
+    if (signingInMemoryKey != null && signingInMemoryPassword != null) {
+        useInMemoryPgpKeys(signingInMemoryKey, signingInMemoryPassword)
+        sign(publishing.publications)
     }
 }
