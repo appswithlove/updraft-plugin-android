@@ -48,10 +48,14 @@ or
   id("com.appswithlove.updraft")
 ```
 
-3.Add one or multiple URLs wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. [https://app.getupdraft.com/api/app_upload/.../.../]())
-With this, the plugin knows to which updraft app your apk should be uploaded.
+3.Configure URLs for your build variants
 
-The part `YourBuildVariant` should be replaced by the exact name your build variant. For example: 
+Add one or more urls entries inside your `updraft` configuration block.
+Each entry maps a build variant name (e.g., `StagingRelease`, `ProdRelease`) to one or more upload URLs.
+
+To get the correct URL, open your Updraft App, copy the https:// part from the curl command (e.g. https://app.getupdraft.com/api/app_upload/.../.../), and paste it as shown below.
+
+This tells the plugin where to upload your APK/AAB files for each build variant.
  
 
 ```groovy
