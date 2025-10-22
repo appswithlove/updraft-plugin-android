@@ -1,5 +1,7 @@
 # updraft-plugin 🚀
 
+[![Maven Central](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft)
+
 This is a gradle plugin for automated upload to updraft.
 
 
@@ -11,8 +13,6 @@ Preconditions:
 - Uses Java 11
  
 1.Add the code below to you `build.gradle` file in the project root folder.
-
-[![Maven Central](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft)
 
 ```groovy
 buildscript {
@@ -48,7 +48,7 @@ or
   id("com.appswithlove.updraft")
 ```
 
-3.Add one or multiple `urls['YOURPRODUCTFLAVOUR']` wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. [https://app.getupdraft.com/api_upload/.../.../]())
+3.Add one or multiple URLs wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. [https://app.getupdraft.com/api/app_upload/.../.../]())
 With this, the plugin knows to which updraft app your apk should be uploaded.
 
 The part `YourBuildVariant` should be replaced by the exact name your build variant. For example: 
@@ -56,8 +56,10 @@ The part `YourBuildVariant` should be replaced by the exact name your build vari
 
 ```groovy
 updraft {
-  urls['StagingRelease'] = ["your/staging/url/"]
-  urls['ProdRelease'] = ["your/prod/url/", "your/prod2/url/"]
+    urls = [
+        "StagingRelease": ["your/staging/url/"],
+        "ProdRelease": ["your/prod/url/", "your/prod2/url/"]
+    ]
 }
 ```
 
