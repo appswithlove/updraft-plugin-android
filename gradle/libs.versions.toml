@@ -8,7 +8,7 @@ lifecycleRuntimeKtx = "2.9.4"
 cglibNodep = "3.3.0"
 dokkaGradlePlugin = "2.0.0"
 junit = "4.13.2"
-updraft = "2.4.0"
+updraft = "1.3.0"
 maven-publish = "0.34.0"
 gradle-publish = "2.0.0"
 coveralls = "2.4.0"
@@ -33,8 +33,9 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.re
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-updraft = { id = "com.appswithlove.updraft", version.ref = "updraft" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publish" }
 coveralls = { id = "com.github.kt3k.coveralls", version.ref = "coveralls" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+# Define Updraft plugin
+# updraft = { id = "com.appswithlove.updraft", version.ref = "updraft" }
