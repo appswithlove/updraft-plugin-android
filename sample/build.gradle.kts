@@ -3,9 +3,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.updraft)
+    // Apply Updraft plugin
+    // alias(libs.plugins.updraft)
 }
 
 android {
@@ -73,12 +73,13 @@ kotlin {
     jvmToolchain(11)
 }
 
-updraft {
-    urls = mapOf(
-        "StageDebug" to listOf("https://app.getupdraft.com/api_upload/.../.../"),
-        "ProdRelease" to listOf("https://app.getupdraft.com/api_upload/.../.../"),
-    )
-}
+// Configure URLs for your build variants
+// updraft {
+//     urls = mapOf(
+//         "StageDebug" to listOf("https://app.getupdraft.com/api_upload/.../.../"),
+//         "ProdRelease" to listOf("https://app.getupdraft.com/api_upload/.../.../"),
+//     )
+// }
 
 dependencies {
     implementation(platform(libs.compose.bom))

@@ -1,5 +1,6 @@
 package com.appswithlove.updraft
 
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,12 +13,12 @@ class UpdraftPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val updraftExtension = project.extensions.create("updraft", UpdraftExtension::class.java)
 
-        val android = project.extensions.getByName("android") as com.android.build.gradle.AppExtension
-        android.applicationVariants.all { variant ->
+        val androidComponents = project.extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
+        androidComponents.onVariants { variant ->
             val variantName = variant.name
             val variantNameCapitalized = variantName.replaceFirstChar { it.uppercase() }
             val flavorName = variant.flavorName
-            val buildTypeName = variant.buildType.name
+            val buildTypeName = variant.buildType
 
             // Providers
             val uploadUrlsProvider = project.providers.provider { updraftExtension.urls }
@@ -33,7 +34,7 @@ class UpdraftPlugin : Plugin<Project> {
             val gitTagsProvider = project.providers.of(GitTagsValueSource::class.java) {}
             val gitCommitProvider = project.providers.of(GitCommitValueSource::class.java) {}
             val gitUrlProvider = project.providers.of(GitUrlValueSource::class.java) {}
-            val flavors = variant.productFlavors.map { it.name }
+            val flavors = variant.productFlavors.map { it.second }
             val releaseNotesProvider =
                 project.providers.provider { getReleaseNotes(project, flavors, updraftExtension) }
 

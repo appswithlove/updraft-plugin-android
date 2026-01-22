@@ -4,6 +4,11 @@
 
 This is a gradle plugin for automated upload to updraft.
 
+## ⚠️ Requirements for v3.0.0+
+
+**Important:** Version `3.0.0` and above requires **Android Gradle Plugin (AGP) 9.0** or higher.
+
+If your project relies on an older version of AGP, please stick to plugin version `2.x.x` until you are ready to upgrade your gradle environment.
 
 ## Instructions
 
@@ -23,7 +28,7 @@ buildscript {
 
   dependencies {
     // ...
-    classpath 'com.appswithlove.updraft:updraft:2.3.0'
+    classpath 'com.appswithlove.updraft:updraft:3.0.0'
   }
 }
 ```
@@ -32,7 +37,7 @@ or
 
 ```kotlin
 plugins {
-  id("com.appswithlove.updraft") version "2.3.0"
+  id("com.appswithlove.updraft") version "3.0.0"
 }
 ```
 
@@ -120,7 +125,7 @@ buildscript {
 		// ...
 	}
 	dependencies {
-	    classpath 'com.appswithlove.updraft:updraft:2.3.0'
+	    classpath 'com.appswithlove.updraft:updraft:3.0.0'
 	    // ...
 	}
 }
