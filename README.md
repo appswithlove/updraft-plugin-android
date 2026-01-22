@@ -1,7 +1,14 @@
 # updraft-plugin 🚀
 
+[![Maven Central](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft)
+
 This is a gradle plugin for automated upload to updraft.
 
+## ⚠️ Requirements for v3.0.0+
+
+**Important:** Version `3.0.0` and above requires **Android Gradle Plugin (AGP) 9.0** or higher.
+
+If your project relies on an older version of AGP, please stick to plugin version `2.x.x` until you are ready to upgrade your gradle environment.
 
 ## Instructions
 
@@ -12,8 +19,6 @@ Preconditions:
  
 1.Add the code below to you `build.gradle` file in the project root folder.
 
-[![Maven Central](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft/badge.svg)](https://maven-badges.sml.io/sonatype-central/com.appswithlove.updraft/updraft)
-
 ```groovy
 buildscript {
   repositories {
@@ -23,7 +28,7 @@ buildscript {
 
   dependencies {
     // ...
-    classpath 'com.appswithlove.updraft:updraft:2.3.0'
+    classpath 'com.appswithlove.updraft:updraft:3.0.0'
   }
 }
 ```
@@ -32,7 +37,7 @@ or
 
 ```kotlin
 plugins {
-  id("com.appswithlove.updraft") version "2.3.0"
+  id("com.appswithlove.updraft") version "3.0.0"
 }
 ```
 
@@ -48,16 +53,22 @@ or
   id("com.appswithlove.updraft")
 ```
 
-3.Add one or multiple `urls['YOURPRODUCTFLAVOUR']` wrapped in `updraft` to the file. To get the url, go to your Updraft App and get the https:// url part of the `curl` command. (e.g. [https://app.getupdraft.com/api_upload/.../.../]())
-With this, the plugin knows to which updraft app your apk should be uploaded.
+3.Configure URLs for your build variants
 
-The part `YourBuildVariant` should be replaced by the exact name your build variant. For example: 
+Add one or more urls entries inside your `updraft` configuration block.
+Each entry maps a build variant name (e.g., `StagingRelease`, `ProdRelease`) to one or more upload URLs.
+
+To get the correct URL, open your Updraft App, copy the https:// part from the curl command (e.g. https://app.getupdraft.com/api/app_upload/.../.../), and paste it as shown below.
+
+This tells the plugin where to upload your APK/AAB files for each build variant.
  
 
 ```groovy
 updraft {
-  urls['StagingRelease'] = ["your/staging/url/"]
-  urls['ProdRelease'] = ["your/prod/url/", "your/prod2/url/"]
+    urls = [
+        "StagingRelease": ["your/staging/url/"],
+        "ProdRelease": ["your/prod/url/", "your/prod2/url/"]
+    ]
 }
 ```
 
@@ -114,7 +125,7 @@ buildscript {
 		// ...
 	}
 	dependencies {
-	    classpath 'com.appswithlove.updraft:updraft:2.3.0'
+	    classpath 'com.appswithlove.updraft:updraft:3.0.0'
 	    // ...
 	}
 }

@@ -1,5 +1,5 @@
 [versions]
-agp = "8.11.1"
+agp = "9.0.0"
 kotlin = "2.2.20"
 composeBom = "2025.10.00"
 activityCompose = "1.11.0"
@@ -32,10 +32,10 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.re
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-updraft = { id = "com.appswithlove.updraft", version.ref = "updraft" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publish" }
 coveralls = { id = "com.github.kt3k.coveralls", version.ref = "coveralls" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+# Define Updraft plugin
+# updraft = { id = "com.appswithlove.updraft", version.ref = "updraft" }
