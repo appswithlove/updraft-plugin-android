@@ -16,6 +16,5 @@ plugins {
     alias(libs.plugins.coveralls)
     alias(libs.plugins.kotlin.jvm) apply false
     id("signing")
-    // Define Updraft plugin
-    // alias(libs.plugins.updraft) apply false
+    alias(libs.plugins.updraft) apply false
 }

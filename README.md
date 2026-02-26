@@ -28,7 +28,7 @@ buildscript {
 
   dependencies {
     // ...
-    classpath 'com.appswithlove.updraft:updraft:3.0.0'
+    classpath 'com.appswithlove.updraft:updraft:3.1.0'
   }
 }
 ```
@@ -37,7 +37,7 @@ or
 
 ```kotlin
 plugins {
-  id("com.appswithlove.updraft") version "3.0.0"
+  id("com.appswithlove.updraft") version "3.1.0"
 }
 ```
 
@@ -125,7 +125,7 @@ buildscript {
 		// ...
 	}
 	dependencies {
-	    classpath 'com.appswithlove.updraft:updraft:3.0.0'
+	    classpath 'com.appswithlove.updraft:updraft:3.1.0'
 	    // ...
 	}
 }

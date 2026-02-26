@@ -13,7 +13,8 @@ class UpdraftPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val updraftExtension = project.extensions.create("updraft", UpdraftExtension::class.java)
 
-        val androidComponents = project.extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
+        val androidComponents =
+            project.extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
         androidComponents.onVariants { variant ->
             val variantName = variant.name
             val variantNameCapitalized = variantName.replaceFirstChar { it.uppercase() }
@@ -90,10 +91,10 @@ class UpdraftPlugin : Plugin<Project> {
                 task.releaseNotes.set(releaseNotesProvider)
 
                 task.doFirst {
-                    val outputFile = apkFile.getOrNull()?.asFile
-                    if (outputFile == null || !outputFile.exists()) {
-                        throw GradleException("Could not find a build artifact. (Make sure to run assemble$variantNameCapitalized task first)")
-                    }
+                    validateBuildArtifact(
+                        apkFile.getOrNull()?.asFile,
+                        "assemble$variantNameCapitalized",
+                    )
                 }
             }
 
@@ -111,16 +112,16 @@ class UpdraftPlugin : Plugin<Project> {
                 task.releaseNotes.set(releaseNotesProvider)
 
                 task.doFirst {
-                    val outputFile = aabFile.getOrNull()?.asFile
-                    if (outputFile == null || !outputFile.exists()) {
-                        throw GradleException("Could not find a build artifact. (Make sure to run bundle$variantNameCapitalized task first)")
-                    }
+                    validateBuildArtifact(
+                        aabFile.getOrNull()?.asFile,
+                        "bundle$variantNameCapitalized",
+                    )
                 }
             }
         }
     }
 
-    private fun getReleaseNotes(
+    internal fun getReleaseNotes(
         project: Project,
         flavors: List<String>,
         updraftExtension: UpdraftExtension,
@@ -164,6 +165,12 @@ class UpdraftPlugin : Plugin<Project> {
                     ""
                 }
             }
+        }
+    }
+
+    internal fun validateBuildArtifact(outputFile: File?, taskName: String) {
+        if (outputFile == null || !outputFile.exists()) {
+            throw GradleException("Could not find a build artifact. (Make sure to run $taskName task first)")
         }
     }
 }
