@@ -109,7 +109,7 @@ abstract class UpdraftTask : DefaultTask() {
     }
 
     companion object {
-        private fun createCurlParam(text: String?, name: String): String {
+        internal fun createCurlParam(text: String?, name: String): String {
             return if (text.isNullOrBlank()) "" else "-F $name=$text"
         }
     }

@@ -6,9 +6,11 @@ activityCompose = "1.11.0"
 coreKtx = "1.17.0"
 lifecycleRuntimeKtx = "2.9.4"
 cglibNodep = "3.3.0"
+junit5 = "5.14.3"
+kotest = "5.9.1"
 dokkaGradlePlugin = "2.0.0"
 junit = "4.13.2"
-updraft = "2.2.9"
+updraft = "3.0.0"
 maven-publish = "0.34.0"
 gradle-publish = "2.0.0"
 coveralls = "2.4.0"
@@ -23,6 +25,10 @@ ui = { module = "androidx.compose.ui:ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 cglib-nodep = { module = "cglib:cglib-nodep", version.ref = "cglibNodep" }
+junit5-bom = { module = "org.junit:junit-bom", version.ref = "junit5" }
+junit5-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
+junit5-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokkaGradlePlugin" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
@@ -37,5 +43,4 @@ maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publ
 gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publish" }
 coveralls = { id = "com.github.kt3k.coveralls", version.ref = "coveralls" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-# Define Updraft plugin
-# updraft = { id = "com.appswithlove.updraft", version.ref = "updraft" }
+updraft = { id = "com.appswithlove.updraft", version.ref = "updraft" }
