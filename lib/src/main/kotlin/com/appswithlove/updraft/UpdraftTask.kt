@@ -78,37 +78,49 @@ abstract class UpdraftTask : DefaultTask() {
                     it.standardOutput = os
                 }
 
-                val execResponse = JsonSlurperClassic().parseText(os.toString())
-
-                if (execResponse is Map<*, *> && execResponse.isNotEmpty()) {
-                    when {
-                        execResponse["success"] == "ok" -> {
-                            val publicUrl = execResponse["public_link"]
-                            println("\n--------------------------------------")
-                            println("Your App was successfully updrafted!")
-                            if (publicUrl != null) println("Get it here -> $publicUrl")
-                            println("--------------------------------------")
-                        }
-
-                        execResponse["detail"] == "Not found." -> {
-                            throw GradleException("Could not updraft to the given url. Please recheck that.")
-                        }
-
-                        else -> {
-                            throw GradleException(os.toString())
-                        }
-                    }
-                } else {
-                    println(execResponse)
-                    println("\n--------------------------------------")
-                    println("Your App was successfully updrafted!")
-                    println("--------------------------------------")
-                }
+                handleResponse(os.toString())
             }
         }
     }
 
     companion object {
+        internal fun handleResponse(response: String) {
+            val execResponse = JsonSlurperClassic().parseText(response)
+
+            if (execResponse is Map<*, *> && execResponse.isNotEmpty()) {
+                when {
+                    execResponse["success"] == "ok" -> {
+                        val publicUrl = execResponse["public_link"]
+                        println("\n--------------------------------------")
+                        println("Your App was successfully updrafted!")
+                        if (publicUrl != null) println("Get it here -> $publicUrl")
+                        println("--------------------------------------")
+                    }
+
+                    // App bundles (AAB) are processed asynchronously: Updraft accepts the upload and returns a task id
+                    execResponse["task_id"] != null -> {
+                        println("\n--------------------------------------")
+                        println("Your App was uploaded to Updraft and is being processed.")
+                        execResponse["task_upload_description"]?.let { println(it) }
+                        println("--------------------------------------")
+                    }
+
+                    execResponse["detail"] == "Not found." -> {
+                        throw GradleException("Could not updraft to the given url. Please recheck that.")
+                    }
+
+                    else -> {
+                        throw GradleException(response)
+                    }
+                }
+            } else {
+                println(execResponse)
+                println("\n--------------------------------------")
+                println("Your App was successfully updrafted!")
+                println("--------------------------------------")
+            }
+        }
+
         internal fun createCurlParam(text: String?, name: String): String {
             return if (text.isNullOrBlank()) "" else "-F $name=$text"
         }
