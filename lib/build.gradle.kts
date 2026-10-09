@@ -15,12 +15,17 @@ plugins {
 
 dependencies {
     implementation(gradleApi())
-    testImplementation(gradleTestKit())
-    testRuntimeOnly(libs.cglib.nodep)
     implementation(libs.kotlin.gradle.plugin)
     implementation(libs.gradle)
     implementation(libs.gradle.api)
     implementation(libs.kotlin.stdlib)
+
+    testImplementation(gradleTestKit())
+    testRuntimeOnly(libs.cglib.nodep)
+    testImplementation(platform(libs.junit5.bom))
+    testImplementation(libs.junit5.jupiter)
+    testImplementation(libs.kotest.assertions)
+    testRuntimeOnly(libs.junit5.launcher)
 }
 
 tasks.withType<GenerateModuleMetadata>().configureEach {
@@ -28,6 +33,10 @@ tasks.withType<GenerateModuleMetadata>().configureEach {
 }
 
 tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    })
     testLogging {
         events("passed", "skipped", "failed", "standardOut", "standardError")
     }

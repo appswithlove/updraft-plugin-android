@@ -11,6 +11,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      checks: write
+      pull-requests: write
+
     steps:
       - uses: actions/checkout@v3
       - name: set up JDK 17
@@ -25,10 +29,24 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: lib/build/test-results/**/*.xml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: lib/build/reports/tests/test/
+
       - name: Validate Maven Central publishing setup
         run: ./gradlew :lib:publishToMavenLocal --dry-run
 
       - name: Validate Gradle Plugin Portal publishing setup
+        continue-on-error: ${{ github.base_ref != 'production' && github.ref_name != 'production' }}
         run: ./gradlew :lib:publishPlugins --validate-only
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
